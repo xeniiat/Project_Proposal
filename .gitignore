@@ -1,1 +1,4 @@
 .github/workflows/run_tests.yaml
+tests/functional_tests.py
+tests/integtation_tests.py
+tests/unit_tests.py
