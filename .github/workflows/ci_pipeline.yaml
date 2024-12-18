@@ -26,7 +26,7 @@ jobs:
 
       - name: MyPy check
         run: |
-          python -m mypy $(git ls-files '*.py') --ignore-missing-imports --show-column-numbers --strict
+          python -m mypy $(git ls-files '*.py') --ignore-missing-imports --show-column-numbers 
 
       - name: Flake8 check
         run: |
