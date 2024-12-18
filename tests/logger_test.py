@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 import os
 import json
 from datetime import datetime
-from logger import Logger
+from Project_Proposal.logger import Logger
 
 class TestLogger(unittest.TestCase):
     def setUp(self):

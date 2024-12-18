@@ -3,7 +3,7 @@ import tempfile
 import os
 import json
 import pytest
-from loader import load_examples
+from Project_Proposal.loader import load_examples
 
 
 # Проверяем, что функция правильно загружает JSON-файлы из указанной директории

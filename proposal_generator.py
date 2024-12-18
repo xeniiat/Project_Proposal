@@ -62,10 +62,3 @@ class ProposalGenerator:
                     prompt += example_text
                     current_length += example_tokens
         return prompt
-
-    def save_proposal(self, topic, proposal):
-        """Сохраняет сгенерированный текст в файл."""
-        file_path = os.path.join(OUTPUT_DIR, f"{topic.replace(' ', '_')}_proposal.txt")
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(proposal)
-        print(f"Saved generated proposal to: {file_path}")
