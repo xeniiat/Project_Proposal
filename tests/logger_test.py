@@ -16,7 +16,7 @@ class TestLogger(unittest.TestCase):
             os.remove(self.log_file)
 
     def test_create_new_log_file_if_not_exists(self):
-        logger = Logger(self.log_file)
+        Logger(self.log_file)
         self.assertTrue(os.path.exists(self.log_file))
         with open(self.log_file, "r", encoding="utf-8") as f:
             logs = json.load(f)

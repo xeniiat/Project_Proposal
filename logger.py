@@ -2,6 +2,7 @@ import os
 import json
 from datetime import datetime
 
+
 class Logger:
     def __init__(self, log_file="logs.json"):
         self.log_file = log_file
