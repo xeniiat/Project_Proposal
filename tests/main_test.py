@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
-from Project_Proposal.loader import load_examples
-from Project_Proposal.proposal_generator import ProposalGenerator
-from Project_Proposal.logger import Logger
+from loader import load_examples
+from proposal_generator import ProposalGenerator
+from logger import Logger
 import json
 
 

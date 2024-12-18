@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from Project_Proposal.proposal_generator import ProposalGenerator
+from proposal_generator import ProposalGenerator
 # from config import MODEL_NAME, MAX_TOKENS, TEMPERATURE, TOP_P, OUTPUT_DIR
 
 
