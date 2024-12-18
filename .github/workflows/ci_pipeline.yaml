@@ -24,10 +24,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Code Style (Pylint)
-        run: |
-          python -m pylint $(git ls-files '*.py') --max-line-length=120 --disable=missing-docstring --output-format=colorized
-
       - name: MyPy check
         run: |
           python -m mypy $(git ls-files '*.py') --ignore-missing-imports --show-column-numbers --strict
@@ -43,4 +39,9 @@ jobs:
       - name: Tests
         run: |
           python -m pytest tests --maxfail=5 --disable-warnings --verbose
+
+      - name: Code Style (Pylint)
+        run: |
+          python -m pylint $(git ls-files '*.py') --max-line-length=120 --disable=missing-docstring --output-format=colorized
+
 
