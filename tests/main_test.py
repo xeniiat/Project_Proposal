@@ -1,9 +1,10 @@
+import json
 import unittest
 from unittest.mock import patch
+
 from loader import load_examples
-from proposal_generator import ProposalGenerator
 from logger import Logger
-import json
+from proposal_generator import ProposalGenerator
 
 
 class TestLoader(unittest.TestCase):
@@ -19,7 +20,8 @@ class TestLoader(unittest.TestCase):
         ]
         with patch('builtins.open', create=True) as mock_open:
             mock_file = mock_open.return_value.__enter__.return_value
-            mock_file.read.side_effect = [json.dumps(mock_json_data[0]), json.dumps(mock_json_data[1])]
+            mock_file.read.side_effect = [json.dumps(mock_json_data[0]),
+                                          json.dumps(mock_json_data[1])]
 
             # Тестируем функцию
             examples = load_examples("dummy_path")

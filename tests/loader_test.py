@@ -1,8 +1,10 @@
-import unittest
-import tempfile
-import os
 import json
+import os
+import tempfile
+import unittest
+
 import pytest
+
 from loader import load_examples
 
 
@@ -30,7 +32,6 @@ class LoaderTests(unittest.TestCase):
         assert {'key': 'value'} in examples
         assert {'another_key': 'another_value'} in examples
 
-# Проверяем, что функция возвращает пустой список, если в директории нет файлов .json
     def test_load_examples_no_json_files(self):
         # Создаем временную директорию без файлов
         temp_dir = tempfile.mkdtemp()
@@ -40,7 +41,6 @@ class LoaderTests(unittest.TestCase):
 
         assert len(examples) == 0
 
-# Проверяем, что функция корректно обрабатывает ситуацию, когда переданный путь не существует
     def test_load_examples_invalid_path(self):
         # Передаем несуществующий путь
         invalid_path = '/nonexistent/path'

@@ -1,6 +1,8 @@
 import os
+
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
-from config import MODEL_NAME, MAX_TOKENS, TEMPERATURE, TOP_P, OUTPUT_DIR
+
+from config import MODEL_NAME, OUTPUT_DIR
 
 
 class ProposalGenerator:
@@ -17,7 +19,8 @@ class ProposalGenerator:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
         prompt = self.create_prompt(topic, examples)
-        input_ids = self.tokenizer.encode(prompt, return_tensors="pt", truncation=True, max_length=1024)
+        input_ids = self.tokenizer.encode(prompt, return_tensors="pt",
+                                          truncation=True, max_length=1024)
         generated_text = prompt  # Начинаем с prompt
 
         while len(generated_text.split()) < min_words:
@@ -29,16 +32,19 @@ class ProposalGenerator:
                 do_sample=True,
                 pad_token_id=self.tokenizer.pad_token_id
             )
-            new_tokens = output[0][input_ids.shape[-1]:]  # Новые токены после текущего input_ids
-            new_text = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
+            new_tokens = output[0][input_ids.shape[-1]:]
+            new_text = self.tokenizer.decode(new_tokens,
+                                             skip_special_tokens=True)
 
-            if not new_text.strip():  # Проверка на пустой результат
+            if not new_text.strip():
                 break
 
-            generated_text += " " + new_text  # Добавляем новые токены к общему тексту
+            generated_text += " " + new_text
 
             # Обновляем input_ids с учетом нового текста, обрезая до max_length
-            input_ids = self.tokenizer.encode(generated_text[-1024:], return_tensors="pt", truncation=True,
+            input_ids = self.tokenizer.encode(generated_text[-1024:],
+                                              return_tensors="pt",
+                                              truncation=True,
                                               max_length=1024)
 
         return generated_text
@@ -55,7 +61,7 @@ class ProposalGenerator:
             if "title" in example:
                 example_text = f"Example {i + 1}:\nTopic: {example['title']}\n"
                 for section, content in example.get("sections", {}).items():
-                    example_text += f"{section}:\n{content[:100]}...\n"  # Усечение длинного текста
+                    example_text += f"{section}:\n{content[:100]}...\n"
 
                 example_tokens = len(self.tokenizer.encode(example_text))
                 if current_length + example_tokens <= max_length:

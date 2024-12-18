@@ -1,6 +1,6 @@
 from loader import load_examples
-from proposal_generator import ProposalGenerator
 from logger import Logger
+from proposal_generator import ProposalGenerator
 
 
 def main():

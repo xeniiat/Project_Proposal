@@ -1,6 +1,7 @@
-import os
 import json
+import os
 from datetime import datetime
+
 
 class Logger:
     def __init__(self, log_file="logs.json"):
