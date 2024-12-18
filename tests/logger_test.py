@@ -1,9 +1,11 @@
-import unittest
-from unittest.mock import patch, MagicMock
-import os
 import json
+import os
+import unittest
 from datetime import datetime
+from unittest.mock import patch
+
 from logger import Logger
+
 
 class TestLogger(unittest.TestCase):
     def setUp(self):
@@ -24,7 +26,9 @@ class TestLogger(unittest.TestCase):
 
     def test_add_entry_to_existing_log_file(self):
         with open(self.log_file, "w", encoding="utf-8") as f:
-            json.dump([{"topic": "Existing Topic", "proposal": "Existing Proposal", "timestamp": "2023-01-01T00:00:00"}], f)
+            json.dump([{"topic": "Existing Topic",
+                        "proposal": "Existing Proposal",
+                        "timestamp": "2023-01-01T00:00:00"}], f)
 
         logger = Logger(self.log_file)
         logger.log("New Topic", "New Proposal")
@@ -38,7 +42,7 @@ class TestLogger(unittest.TestCase):
             {
                 "topic": "New Topic",
                 "proposal": "New Proposal",
-                "timestamp": logs[-1]["timestamp"]  # Проверяем только наличие ключа timestamp
+                "timestamp": logs[-1]["timestamp"]
             }
         )
 
@@ -81,9 +85,10 @@ class TestLogger(unittest.TestCase):
                 {
                     "topic": topics[i],
                     "proposal": proposals[i],
-                    "timestamp": entry["timestamp"]  # Проверяем только наличие ключа timestamp
+                    "timestamp": entry["timestamp"]
                 }
             )
+
 
 if __name__ == '__main__':
     unittest.main()
