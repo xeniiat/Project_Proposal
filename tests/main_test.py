@@ -1,25 +1,35 @@
+import json
 import unittest
 from unittest.mock import patch
+
 from loader import load_examples
-from proposal_generator import ProposalGenerator
 from logger import Logger
+from proposal_generator import ProposalGenerator
 
 
 class TestLoader(unittest.TestCase):
     @patch('loader.os.listdir')
     def test_load_examples(self, mock_listdir):
         # Настраиваем список файлов для имитации содержимого папки
-        mock_listdir.return_value = ['example1.txt', 'example2.txt']
+        mock_listdir.return_value = ['example1.json', 'example2.json']
 
         # Имитация чтения файла
-        with patch('builtins.open') as mock_open:
+        mock_json_data = [
+            {"key1": "value1"},
+            {"key2": "value2"}
+        ]
+        with patch('builtins.open', create=True) as mock_open:
             mock_file = mock_open.return_value.__enter__.return_value
-            mock_file.read.side_effect = ["Example content 1", "Example content 2"]
+            mock_file.read.side_effect = [json.dumps(mock_json_data[0]),
+                                          json.dumps(mock_json_data[1])]
 
-            examples = load_examples("examples")
+            # Тестируем функцию
+            examples = load_examples("dummy_path")
+
+            # Проверяем, что функция вернула правильные данные
             self.assertEqual(len(examples), 2)
-            self.assertIn("Example content 1", examples)
-            self.assertIn("Example content 2", examples)
+            self.assertIn(mock_json_data[0], examples)
+            self.assertIn(mock_json_data[1], examples)
 
 
 class TestProposalGenerator(unittest.TestCase):
