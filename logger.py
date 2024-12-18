@@ -3,17 +3,14 @@ import json
 from datetime import datetime
 
 class Logger:
-    def __init__(self, log_dir="logs"):
-        self.log_file = os.path.join(log_dir, "generation_log.json")
-        os.makedirs(log_dir, exist_ok=True)
-
-        # Если файла нет, создаем его
-        if not os.path.exists(self.log_file):
-            with open(self.log_file, "w", encoding="utf-8") as f:
+    def __init__(self, log_file="logs.json"):
+        self.log_file = log_file
+        if not os.path.exists(log_file):
+            with open(log_file, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
     def log(self, topic, proposal):
-        """Сохраняет информацию о сгенерированном Project Proposal."""
+        """Добавляет запись в лог."""
         with open(self.log_file, "r", encoding="utf-8") as f:
             logs = json.load(f)
 

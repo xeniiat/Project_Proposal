@@ -1,63 +1,71 @@
-import openai
-from config import OPENAI_API_KEY, MODEL_NAME, MAX_TOKENS, TEMPERATURE
 import os
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from config import MODEL_NAME, MAX_TOKENS, TEMPERATURE, TOP_P, OUTPUT_DIR
+
 
 class ProposalGenerator:
-    def __init__(self, output_dir="generated"):
-        openai.api_key = OPENAI_API_KEY
-        self.output_dir = output_dir
-        os.makedirs(output_dir, exist_ok=True)  # Создаем папку для сохранения текстов
+    def __init__(self):
+        """Загружает локальную модель и токенизатор."""
+        print("Loading the GPT-2 model...")
+        self.tokenizer = GPT2Tokenizer.from_pretrained(MODEL_NAME)
+        self.model = GPT2LMHeadModel.from_pretrained(MODEL_NAME)
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    def generate(self, topic, examples):
-        """Генерирует Project Proposal на заданную тему с разделами."""
-        # Формируем контекст из примеров
-        sections = self.extract_sections(examples)
+    def generate(self, topic, examples, min_words=2000):
+        """Генерирует текст по частям для длинных последовательностей."""
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        # Подготовка запроса к GPT-4
-        prompt = self.create_prompt(topic, sections)
+        prompt = self.create_prompt(topic, examples)
+        input_ids = self.tokenizer.encode(prompt, return_tensors="pt", truncation=True, max_length=1024)
+        generated_text = prompt  # Начинаем с prompt
 
-        # Запрос к модели
-        response = openai.ChatCompletion.create(
-            model=MODEL_NAME,
-            messages=[{"role": "system", "content": "Ты создаешь Project Proposal."},
-                      {"role": "user", "content": prompt}],
-            max_tokens=MAX_TOKENS,
-            temperature=TEMPERATURE
-        )
+        while len(generated_text.split()) < min_words:
+            output = self.model.generate(
+                input_ids=input_ids,
+                max_new_tokens=500,
+                temperature=0.7,
+                top_p=0.9,
+                do_sample=True,
+                pad_token_id=self.tokenizer.pad_token_id
+            )
+            new_tokens = output[0][input_ids.shape[-1]:]  # Новые токены после текущего input_ids
+            new_text = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
 
-        proposal = response['choices'][0]['message']['content']
+            if not new_text.strip():  # Проверка на пустой результат
+                break
 
-        # Сохранение результата
-        self.save_proposal(topic, proposal)
+            generated_text += " " + new_text  # Добавляем новые токены к общему тексту
 
-        return proposal
+            # Обновляем input_ids с учетом нового текста, обрезая до max_length
+            input_ids = self.tokenizer.encode(generated_text[-1024:], return_tensors="pt", truncation=True,
+                                              max_length=1024)
 
-    def extract_sections(self, examples):
-        """Извлекает секции из примеров."""
-        sections = {}
-        for example in examples:
-            for section, content in example["sections"].items():
-                if section not in sections:
-                    sections[section] = []
-                sections[section].append(content)
-        return sections
+        return generated_text
 
-    def create_prompt(self, topic, sections):
-        """Создает текст запроса для GPT-4."""
-        prompt = f"Создай Project Proposal на тему '{topic}'. Следующие примеры содержат структуру текста:\n\n"
+    def create_prompt(self, topic, examples, max_length=700):
+        """Создает текст запроса с ограничением длины."""
+        prompt = f"Generate a Project Proposal on the topic '{topic}'.\n\n"
+        current_length = len(self.tokenizer.encode(prompt))
 
-        for section, contents in sections.items():
-            prompt += f"Раздел {section}:\n"
-            for content in contents:
-                prompt += f"- {content}\n"
-            prompt += "\n"
+        for i, example in enumerate(examples):
+            if current_length >= max_length:
+                break
 
-        prompt += "Создай новый текст с такими же разделами."
+            if "title" in example:
+                example_text = f"Example {i + 1}:\nTopic: {example['title']}\n"
+                for section, content in example.get("sections", {}).items():
+                    example_text += f"{section}:\n{content[:100]}...\n"  # Усечение длинного текста
+
+                example_tokens = len(self.tokenizer.encode(example_text))
+                if current_length + example_tokens <= max_length:
+                    prompt += example_text
+                    current_length += example_tokens
         return prompt
 
     def save_proposal(self, topic, proposal):
         """Сохраняет сгенерированный текст в файл."""
-        filename = os.path.join(self.output_dir, f"{topic.replace(' ', '_')}_proposal.txt")
-        with open(filename, "w", encoding="utf-8") as f:
+        file_path = os.path.join(OUTPUT_DIR, f"{topic.replace(' ', '_')}_proposal.txt")
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(proposal)
-        print(f"Сгенерированный текст сохранен в {filename}")
+        print(f"Saved generated proposal to: {file_path}")

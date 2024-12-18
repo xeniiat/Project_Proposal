@@ -3,7 +3,7 @@ import json
 
 
 def load_examples(path):
-    """Загружает примеры Project Proposal из папки."""
+    """Loading examples from JSON-files."""
     examples = []
     for file_name in os.listdir(path):
         if file_name.endswith(".json"):
