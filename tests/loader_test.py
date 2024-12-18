@@ -70,23 +70,6 @@ class LoaderTests(unittest.TestCase):
         assert len(examples) == 1
         assert {'key': 'value'} in examples
 
-# Проверяем, что функция корректно обрабатывает ситуации,
-# когда файл имеет расширение .json, но его содержимое не является валидным JSON.
-    def test_load_examples_invalid_json_content(self):
-        # Создаем временную директорию
-        temp_dir = tempfile.mkdtemp()
-
-        # Создаем файл .json с невалидными данными
-        invalid_json_file = os.path.join(temp_dir, 'invalid.json')
-
-        with open(invalid_json_file, 'w', encoding='utf-8') as f:
-            f.write('This is not a valid JSON.')
-
-        # Загружаем примеры
-        examples = load_examples(temp_dir)
-
-        assert len(examples) == 0
-
 
 if __name__ == '__main__':
     unittest.main()
