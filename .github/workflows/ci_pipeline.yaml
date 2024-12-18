@@ -28,10 +28,6 @@ jobs:
         run: |
           python -m mypy $(git ls-files '*.py') --ignore-missing-imports --show-column-numbers 
 
-      - name: Flake8 check
-        run: |
-          python -m flake8 $(git ls-files '*.py') --max-line-length=120 --extend-ignore=E203,W503
-
       - name: Doc8 check
         run: |
           python -m doc8 $(git ls-files '*.py') --max-line-length=120
@@ -39,6 +35,10 @@ jobs:
       - name: Tests
         run: |
           python -m pytest tests --maxfail=5 --disable-warnings --verbose
+
+      - name: Flake8 check
+        run: |
+          python -m flake8 $(git ls-files '*.py') --max-line-length=120 --extend-ignore=E203,W503
 
       - name: Code Style (Pylint)
         run: |
